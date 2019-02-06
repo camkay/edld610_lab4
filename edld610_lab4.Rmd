@@ -19,6 +19,9 @@ library(here)
 library(colorblindr)
 library(colorspace)
 library(cowplot)
+library(ggmap)
+library(maps)
+library(mapdata)
 
 # load data
 df <- import(here("data/honeyproduction.csv"), setclass = "tibble") %>%
