@@ -124,21 +124,46 @@ cam_data <- honey_data %>%
   rowwise() %>%
   mutate(region = state.name[grep(state, state.abb)],
          region = tolower(region)) %>%
-  left_join(map_data, by = "region")
+  left_join(map_data, by = "region") %>%
+  filter(region != "hawaii")
 
 # check lengths
 length(unique(honey_data$state))
 length(unique(cam_data$region))
 
+# find centroids
+centroids <- data.frame(state = c(unique(cam_data$state)),
+                        long  = rep(NA, length(unique(cam_data$state))),
+                        lat   = rep(NA, length(unique(cam_data$state))))
+                                   
+centroid_data <- cam_data %>%
+  ungroup() %>%
+  select(state, long, lat) 
+
+for (i in 1:length(unique(centroid_data$state))) {
+  data_temp <- filter(centroid_data, state == unique(centroid_data$state)[i])
+  centroid_temp <- centroid(data_temp[, c("long", "lat")])
+  centroids[i, "long"] <- centroid_temp[1]
+  centroids[i, "lat"]  <- centroid_temp[2]
+}
+
 # plot
-ggplot(data = cam_data) + 
-  geom_polygon(aes(x = long, y = lat, fill = totalprod_m, group = group), color = "white") + 
+ggplot(data = cam_data, aes(x = long, y = lat)) + 
+  geom_polygon(data = map_data, aes(group = group), fill = "grey80") +
+  geom_polygon(aes(fill = totalprod_m, group = group), color = "white") + 
   coord_fixed(1.3) +
   scale_fill_continuous_sequential("Oranges") +
-  labs(title = "Average honey production for each state from 1998 to 2012",
+  labs(title = "Honey production for each of the contiguous states",
+       subtitle = "Average production between 1998 and 20012",
        x = "",
        y = "",
        fill = "Total production (millions)") +
   theme_void() +
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom") + 
+  geom_text(data = centroids, aes(label = state))
+  
+
+  
+  
+
 ```
