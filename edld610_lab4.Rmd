@@ -10,6 +10,7 @@ output: html_document
 #devtools::install_github("wilkelab/cowplot")
 #install.packages("colorspace", repos = "http://R-Forge.R-project.org")
 #devtools::install_github("clauswilke/colorblindr")
+install.packages("rcartocolor")
 
 # load packages
 library(tidyverse)
@@ -22,6 +23,8 @@ library(cowplot)
 library(ggmap)
 library(maps)
 library(mapdata)
+library(ggthemes)
+library(rcartocolor)
 
 # load data
 honey_data <- import(here("data/honeyproduction.csv"), setclass = "tibble") %>%
@@ -40,12 +43,61 @@ honey_data <- import(here("data/honeyproduction.csv"), setclass = "tibble") %>%
 
 ```
 
-```{r part_4}
+
+### 4. Download the file here denoting the region and division of each state. (Lea)
+
++ Join the file with your honey file.
++ Produce a bar plot displaying the average honey.
++ Use color to highlight the region of the country the state is from.
++ Note patterns you notice.
+
+```{r part_4_Lea}
+region <- import("https://raw.githubusercontent.com/cphalpert/census-regions/master/us%20census%20bureau%20regions%20and%20divisions.csv")
+
+honey_join <- left_join(honey_data, region, by = c("state" = "State Code"))
+
+honey_join <- honey_join %>% 
+  group_by(state) %>% 
+  summarize(avgprod = mean(totalprod)) %>% 
+  left_join(honey_join)
 
 ```
 
-```{r part_5}
+```{r part_4_Lea}
+honey_join <- honey_join %>% 
+  ungroup() %>% 
+  mutate(avgprod_mil = avgprod/100000)
 
+honey_join %>% 
+  ggplot(aes(x = reorder(state, avgprod_mil), y = avgprod_mil, fill = Region)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  theme_minimal() +
+  scale_fill_OkabeIto() +
+  labs(title = "Average Honey Production by State",
+       x = "State", y = "Average Honey Production \n (in millions)")
+  
+```
+
+Something to note from this figure is that the average honey production from 1998 to 2012 was greatest in Midwest and Western states, while the lowest average honey production came out of Northeast and some Southern states. Average honey production in Southern states varied a lot, with Florida producing a large numbers of honey, but Oklahoma and Maryland producing the lowest numbers.
+
+#### Create a heatmap displaying the average honey production across years by region.
+
+```{r part_5_LF}
+honey_avg_region <- honey_join %>% 
+  group_by(Region, year) %>% 
+  summarize(avgprod_mil = mean(totalprod)/100000)
+
+cont_colorpal <- paletteer_d("rcartocolor","BurgYl", type = "continuous")
+
+honey_avg_region %>% 
+  ggplot(aes(x = year, y = reorder(Region, avgprod_mil), fill = avgprod_mil)) +
+  geom_tile() +
+  scale_fill_carto_c(palette = "BurgYl",
+                     name = "Average Honey Production \n (in millions)") +
+  labs(title = "Average Honey Production by Region from 1998 to 2012",
+       x = "Year", y = "Region") +
+  theme_minimal()
 ```
 
 ### Create at least one more plot of your choosing using color to distinguish, represent data values, or highlight. If you are interested in producing maps, I would recommend joining the data with the output from ggplot2::map_data("state"). But be careful with keys and that you don’t end up with a many-to-many join. See here for additional help
