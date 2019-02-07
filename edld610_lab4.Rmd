@@ -6,6 +6,14 @@ output: html_document
 ---
 
 ```{r setup, include = FALSE}
+
+# set knitr options
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.width = 7.5,
+                      fig.height = 4.0)
+
 # install github packages
 #devtools::install_github("wilkelab/cowplot")
 #install.packages("colorspace", repos = "http://R-Forge.R-project.org")
@@ -25,24 +33,121 @@ library(maps)
 library(mapdata)
 library(ggthemes)
 library(rcartocolor)
+library(gghighlight)
+library(ggrepel)
 
 # load data
 honey_data <- import(here("data/honeyproduction.csv"), setclass = "tibble") %>%
   janitor::clean_names()
 ```
 
+### 1) Visualize the total production of honey across years by state. Use color to highlight the west coast (Washington, Oregon, and California).
+
 ```{r part_1}
 
+honey_data %<>%
+  mutate(totalprod_mil = totalprod/1000000)
+
+ggplot(honey_data, aes(x = year, y = totalprod_mil, color = state)) +
+  geom_line(size = 1) +
+  gghighlight(state == "OR" |
+                state == "WA" |
+                state == "CA") +
+  scale_color_manual(values = c("#fde0dd", "#fa9fb5", "#c51b8a")) +
+  theme_minimal() +
+  theme(axis.title = element_text(colour = "gray20", face = "bold"),
+        plot.title = element_text(face = "bold")) +
+  labs(title = "Figure 2. Total production of honey (in millions) across years by state",
+         subtitle = "Highlighted lines represent west coast states (California, Washington, and Oregon)",
+         y = "Total production of honey * 1,000,000",
+         x = "Year")
+
+#values = c("#157381", "#4D306E", "#C0A5E1")
+#values = c("#fde0dd", "#fa9fb5", "#c51b8a")
+
 ```
+
+```{r part_1_alt, include=FALSE, eval=FALSE}
+
+#this approach will also yeild a similar graph to above, but this way is less efficient
+
+to_label <- c("WA", "OR", "CA")
+subset_states <- honey_data %>%
+    filter(state %in% to_label,
+           year == '2012')
+
+ggplot(honey_data, aes(x = year, y = totalprod_mil, group = state)) +
+  geom_line(color = "gray20", linetype = 3) +
+  geom_line(data = filter(honey_data, 
+                          state == "OR" |
+                          state == "WA" | 
+                          state == "CA"),
+            color = "#1CAEAE",
+            size = 1) +
+  geom_text_repel(aes(label = state), data = subset_states, size = 4) +
+  theme_minimal() +
+  theme(axis.title = element_text(colour = "gray20"),
+        plot.title = element_text(face = "bold")) +
+  labs(title = "Figure 1. Total production of honey (in millions) across years by state",
+         subtitle = "Highlighted lines represent west coast states (California, Washington, and Oregon)",
+         y = "Total production of honey * 1,000,000",
+         x = "Year") 
+
+```
+
+### 2) Reproduce the plot according three different kinds of color blindness, as well as a desaturated version.
+
+**Note that the line representing California may not be the best choice if we want the plot to be readable to all viewers.**
 
 ```{r part_2}
 
+ash_plot1 <- ggplot(honey_data, aes(x = year, y = totalprod_mil, color = state)) +
+  geom_line(size = 1) +
+  gghighlight(state == "OR" |
+                state == "WA" |
+                state == "CA") +
+  scale_color_manual(values = c("#fde0dd", "#fa9fb5", "#c51b8a")) +
+  theme_void()
+
+colorblindr::cvd_grid(ash_plot1)
+
 ```
+
+### 3) Reproduce the plot using a color blind safe pallette.
 
 ```{r part_3}
 
+ggplot(honey_data, aes(x = year, y = totalprod_mil, color = state)) +
+  geom_line(size = 1) +
+  gghighlight(state == "OR" |
+                state == "WA" |
+                state == "CA") +
+  scale_color_viridis_d() +
+  theme_minimal() +
+  theme(axis.title = element_text(colour = "gray20", face = "bold"),
+        plot.title = element_text(face = "bold")) +
+  labs(title = "Figure 2. Total production of honey (in millions) across years by state",
+         subtitle = "Highlighted lines represent west coast states (California, Washington, and Oregon)",
+         y = "Total production of honey * 1,000,000",
+         x = "Year")
+  
 ```
 
+**While the following plot uses a color blind safe pallette, note that the line representing Washington is not easily viewable in the Desaturated condition.**
+
+```{r part_3_color_check}
+
+ash_plot2 <- ggplot(honey_data, aes(x = year, y = totalprod_mil, color = state)) +
+  geom_line(size = 1) +
+  gghighlight(state == "OR" |
+                state == "WA" |
+                state == "CA") +
+  scale_color_viridis_d() +
+  theme_void()
+
+colorblindr::cvd_grid(ash_plot2)
+
+```
 
 ### 4. Download the file here denoting the region and division of each state. (Lea)
 
@@ -81,7 +186,7 @@ honey_join %>%
 
 Something to note from this figure is that the average honey production from 1998 to 2012 was greatest in Midwest and Western states, while the lowest average honey production came out of Northeast and some Southern states. Average honey production in Southern states varied a lot, with Florida producing a large numbers of honey, but Oklahoma and Maryland producing the lowest numbers.
 
-#### Create a heatmap displaying the average honey production across years by region.
+#### 5) Create a heatmap displaying the average honey production across years by region.
 
 ```{r part_5_LF}
 honey_avg_region <- honey_join %>% 
@@ -100,7 +205,7 @@ honey_avg_region %>%
   theme_minimal()
 ```
 
-### Create at least one more plot of your choosing using color to distinguish, represent data values, or highlight. If you are interested in producing maps, I would recommend joining the data with the output from ggplot2::map_data("state"). But be careful with keys and that you don’t end up with a many-to-many join. See here for additional help
+### 6) Create at least one more plot of your choosing using color to distinguish, represent data values, or highlight. If you are interested in producing maps, I would recommend joining the data with the output from ggplot2::map_data("state"). But be careful with keys and that you don’t end up with a many-to-many join. 
 
 ```{r part_6}
 # load map data
