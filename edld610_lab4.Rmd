@@ -58,7 +58,7 @@ ggplot(honey_data, aes(x = year, y = totalprod_mil, color = state)) +
   theme_minimal() +
   theme(axis.title = element_text(colour = "gray20", face = "bold"),
         plot.title = element_text(face = "bold")) +
-  labs(title = "Figure 2. Total production of honey (in millions) across years by state",
+  labs(title = "Figure 1. Total production of honey (in millions) across years by state",
          subtitle = "Highlighted lines represent west coast states (California, Washington, and Oregon)",
          y = "Total production of honey * 1,000,000",
          x = "Year")
@@ -267,9 +267,5 @@ ggplot(data = cam_data, aes(x = long, y = lat)) +
   theme_void() +
   theme(legend.position = "bottom") + 
   geom_text(data = centroids, aes(label = state))
-  
-
-  
-  
 
 ```
