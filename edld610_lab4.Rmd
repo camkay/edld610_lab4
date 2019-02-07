@@ -18,7 +18,7 @@ knitr::opts_chunk$set(echo = TRUE,
 #devtools::install_github("wilkelab/cowplot")
 #install.packages("colorspace", repos = "http://R-Forge.R-project.org")
 #devtools::install_github("clauswilke/colorblindr")
-install.packages("rcartocolor")
+#install.packages("rcartocolor")
 
 # load packages
 library(tidyverse)
@@ -35,6 +35,7 @@ library(ggthemes)
 library(rcartocolor)
 library(gghighlight)
 library(ggrepel)
+library(geosphere)
 
 # load data
 honey_data <- import(here("data/honeyproduction.csv"), setclass = "tibble") %>%
