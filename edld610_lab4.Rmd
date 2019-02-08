@@ -62,7 +62,7 @@ ggplot(honey_data, aes(x = year, y = totalprod_mil, color = state)) +
   gghighlight(state == "OR" |
                 state == "WA" |
                 state == "CA") +
-  scale_color_carto_d(palette = "BurgYl") +
+  scale_color_carto_d(palette = "Burg") +
   theme_minimal() +
   theme(axis.title = element_text(colour = "gray20", face = "bold"),
         plot.title = element_text(face = "bold")) +
@@ -113,14 +113,14 @@ ash_plot1 <- ggplot(honey_data, aes(x = year, y = totalprod_mil, color = state))
   gghighlight(state == "OR" |
                 state == "WA" |
                 state == "CA") +
-  scale_color_carto_d(palette = "BurgYl") +
+  scale_color_carto_d(palette = "Burg") +
   theme_void()
 
 colorblindr::cvd_grid(ash_plot1)
 
 ```
 
-Note that the line representing California may not be the best choice if we want the plot to be readable to all viewers (it's hard to see in the desaturated condition).
+Note that the line representing California may not be the best choice if we want the plot to be readable to all viewers (it's hard to see in both the protanomaly and desaturated conditions).
 
 #### 3) Reproduce the plot using a color blind safe pallette. (Ash)
 
@@ -156,7 +156,7 @@ colorblindr::cvd_grid(ash_plot2)
 
 ```
 
-While the above plot (Fig. 2) uses a color blind safe pallette, note that the line representing Washington is not easily viewable in the Desaturated condition.
+While the above plot (Fig. 2) uses a color blind safe pallette, note that the line representing Washington is not easily distinguishable in the desaturated condition.
 
 #### 4. Download the file here denoting the region and division of each state. (Lea)
 
