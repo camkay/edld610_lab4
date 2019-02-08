@@ -195,7 +195,7 @@ honey_join %>%
 
 Something to note from this figure is that the average honey production from 1998 to 2012 was greatest in Midwest and Western states, while the lowest average honey production came out of Northeast and some Southern states. Average honey production in Southern states varied a lot, with Florida producing a large numbers of honey, but Oklahoma and Maryland producing the lowest numbers.
 
-#### 5) Create a heatmap displaying the average honey production across years by region.
+#### 5) Create a heatmap displaying the average honey production across years by region. (Lea)
 
 ```{r part_5_LF}
 honey_avg_region <- honey_join %>% 
