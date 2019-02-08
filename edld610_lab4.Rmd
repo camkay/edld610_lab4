@@ -177,7 +177,7 @@ honey_join <- honey_join %>%
 
 ```
 
-```{r part_4_Lea2}
+```{r part_4_Lea2, fig.height=6.0}
 honey_join <- honey_join %>% 
   ungroup() %>% 
   mutate(avgprod_mil = avgprod/100000)
