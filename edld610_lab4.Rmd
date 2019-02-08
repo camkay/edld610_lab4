@@ -1,8 +1,15 @@
 ---
-title: "edld610_lab4"
+title: "EDLD 610: Lab 4"
 author: "Cameron Kay, Lea Frank, Ashley Miller"
 date: "2/5/2019"
-output: html_document
+output:
+  html_document:
+    theme: spacelab
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include = FALSE}
@@ -36,13 +43,14 @@ library(rcartocolor)
 library(gghighlight)
 library(ggrepel)
 library(geosphere)
+library(paletteer)
 
 # load data
 honey_data <- import(here("data/honeyproduction.csv"), setclass = "tibble") %>%
   janitor::clean_names()
 ```
 
-### 1) Visualize the total production of honey across years by state. Use color to highlight the west coast (Washington, Oregon, and California).
+#### 1) Visualize the total production of honey across years by state. Use color to highlight the west coast (Washington, Oregon, and California). (Ash)
 
 ```{r part_1}
 
@@ -54,7 +62,7 @@ ggplot(honey_data, aes(x = year, y = totalprod_mil, color = state)) +
   gghighlight(state == "OR" |
                 state == "WA" |
                 state == "CA") +
-  scale_color_manual(values = c("#fde0dd", "#fa9fb5", "#c51b8a")) +
+  scale_color_carto_d(palette = "BurgYl") +
   theme_minimal() +
   theme(axis.title = element_text(colour = "gray20", face = "bold"),
         plot.title = element_text(face = "bold")) +
@@ -96,9 +104,7 @@ ggplot(honey_data, aes(x = year, y = totalprod_mil, group = state)) +
 
 ```
 
-### 2) Reproduce the plot according three different kinds of color blindness, as well as a desaturated version.
-
-**Note that the line representing California may not be the best choice if we want the plot to be readable to all viewers.**
+#### 2) Reproduce the plot according three different kinds of color blindness, as well as a desaturated version. (Ash)
 
 ```{r part_2}
 
@@ -107,14 +113,16 @@ ash_plot1 <- ggplot(honey_data, aes(x = year, y = totalprod_mil, color = state))
   gghighlight(state == "OR" |
                 state == "WA" |
                 state == "CA") +
-  scale_color_manual(values = c("#fde0dd", "#fa9fb5", "#c51b8a")) +
+  scale_color_carto_d(palette = "BurgYl") +
   theme_void()
 
 colorblindr::cvd_grid(ash_plot1)
 
 ```
 
-### 3) Reproduce the plot using a color blind safe pallette.
+Note that the line representing California may not be the best choice if we want the plot to be readable to all viewers (it's hard to see in the desaturated condition).
+
+#### 3) Reproduce the plot using a color blind safe pallette. (Ash)
 
 ```{r part_3}
 
@@ -134,8 +142,6 @@ ggplot(honey_data, aes(x = year, y = totalprod_mil, color = state)) +
   
 ```
 
-**While the following plot uses a color blind safe pallette, note that the line representing Washington is not easily viewable in the Desaturated condition.**
-
 ```{r part_3_color_check}
 
 ash_plot2 <- ggplot(honey_data, aes(x = year, y = totalprod_mil, color = state)) +
@@ -150,14 +156,16 @@ colorblindr::cvd_grid(ash_plot2)
 
 ```
 
-### 4. Download the file here denoting the region and division of each state. (Lea)
+While the above plot (Fig. 2) uses a color blind safe pallette, note that the line representing Washington is not easily viewable in the Desaturated condition.
+
+#### 4. Download the file here denoting the region and division of each state. (Lea)
 
 + Join the file with your honey file.
 + Produce a bar plot displaying the average honey.
 + Use color to highlight the region of the country the state is from.
 + Note patterns you notice.
 
-```{r part_4_Lea}
+```{r part_4_Lea1}
 region <- import("https://raw.githubusercontent.com/cphalpert/census-regions/master/us%20census%20bureau%20regions%20and%20divisions.csv")
 
 honey_join <- left_join(honey_data, region, by = c("state" = "State Code"))
@@ -169,7 +177,7 @@ honey_join <- honey_join %>%
 
 ```
 
-```{r part_4_Lea}
+```{r part_4_Lea2}
 honey_join <- honey_join %>% 
   ungroup() %>% 
   mutate(avgprod_mil = avgprod/100000)
@@ -206,7 +214,7 @@ honey_avg_region %>%
   theme_minimal()
 ```
 
-### 6) Create at least one more plot of your choosing using color to distinguish, represent data values, or highlight. If you are interested in producing maps, I would recommend joining the data with the output from ggplot2::map_data("state"). But be careful with keys and that you don’t end up with a many-to-many join. 
+#### 6) Create at least one more plot of your choosing using color to distinguish, represent data values, or highlight. If you are interested in producing maps, I would recommend joining the data with the output from ggplot2::map_data("state"). But be careful with keys and that you don’t end up with a many-to-many join. (Cam)
 
 ```{r part_6}
 # load map data
